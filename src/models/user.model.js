@@ -7,8 +7,9 @@ const user = new Schema({
         required: true
     },
     privilege: {
-       type: Number,
-       required: true
+        type: Number,
+        default: 0,
+        required: true
     },
     points: {
         type: Number,
