@@ -1,22 +1,52 @@
 const mongoose = require('mongoose');
 const Discord = require('discord.js');
-const {bot_token, wit_token} = require('./config.json');
+const {Wit, log} = require('node-wit');
 const fs = require('fs');
 
+// Get sensitive configurations
+const {bot_token, wit_token} = require('./config.json');
+
+// Authenticate wit
+const wit_client = new Wit({
+    accessToken: wit_token,
+    logger: new log.Logger(log.DEBUG)
+});
+
+// Start discord client
 const client = new Discord.Client();
+
+// Create command handler and cooldown handler
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
+// Set commands
 for (const file of commandFiles) {
-    const command = require('./src/commands/${file}');
+    const command = require('./src/commands/' + file);
     client.commands.set(command.name, command);
 }
 
+// Handle bot commands
 client.on('message', message => {
+    //console.log(message.member.roles.cache);
+    if (message.author == client.user) return;
+
+    if (!message.member.roles.cache.has('447204257268236289')) { // Change for empire upon deployment
+        message.channel.send('Sorry, you do not have access to this bot!')
+            .then();
+    }
+    // Only command not in handler
+    if (message.content === '!logout') {
+        message.channel.send('Logging off.')
+            .then(r => {
+                client.destroy();
+            });
+    }
+
     const commandName = message; // TEMPORARY
     const args = "poop"; // Temporary
+
     if (!client.commands.has(commandName)) return;
 
     const command = client.commands.get(commandName);
@@ -24,6 +54,7 @@ client.on('message', message => {
     if (command.guildOnly && message.channel.type !== 'text') {
         return message.reply('I can\'t execute that command inside DMs!');
     }
+
     if (!cooldowns.has(command.name)) {
         cooldowns.set(command.name, new Discord.Collection());
     }
