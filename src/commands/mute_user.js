@@ -33,10 +33,12 @@ module.exports = {
                                         else {
                                             message.channel.send("Sorry! Something went wrong!");
                                         }
-                                    });
+                                    }).catch(error => {
+                                        console.error(error);
+                                });
                             }
                             return;
-                        });
+                        }).catch(error => {console.error(error);});
 
                    /* voice.setMute(true, "for being a cunt")
                         .then(result => {
