@@ -32,55 +32,65 @@ client.on('message', message => {
     //console.log(message.member.roles.cache);
     if (message.author == client.user) return;
 
+    // Restrict who can use the bot
     if (!message.member.roles.cache.has('447204257268236289')) { // Change for empire upon deployment
-        message.channel.send('Sorry, you do not have access to this bot!')
-            .then();
+        message.channel.send('Sorry, you do not have access to this bot!').then(() => {
+            return;
+        });
     }
+
     // Only command not in handler
     if (message.content === '!logout') {
-        message.channel.send('Logging off.')
-            .then(r => {
-                client.destroy();
-            });
+        message.channel.send('Logging off.').then(r => {
+            client.destroy();
+        });
+        return;
     }
+    // process message
+    var commandName = message; // TEMPORARY
+    var args = ""; // Temporary
+    wit_client.message(message)
+        .then((data) => {
+            commandName = data["intents"][0]["name"];
+            args = data["entities"]["user:user"][0]["body"];
+            console.log(commandName)
 
-    const commandName = message; // TEMPORARY
-    const args = "poop"; // Temporary
+            if (!client.commands.has(commandName)) return;
 
-    if (!client.commands.has(commandName)) return;
+            const command = client.commands.get(commandName);
 
-    const command = client.commands.get(commandName);
+            if (command.guildOnly && message.channel.type !== 'text') {
+                return message.reply('I can\'t execute that command inside DMs!');
+            }
 
-    if (command.guildOnly && message.channel.type !== 'text') {
-        return message.reply('I can\'t execute that command inside DMs!');
-    }
+            if (!cooldowns.has(command.name)) {
+                cooldowns.set(command.name, new Discord.Collection());
+            }
 
-    if (!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
-    }
+            const now = Date.now();
+            const timestamps = cooldowns.get(command.name);
+            const cooldownAmount = (command.cooldown || 3) * 1000;
 
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000;
+            if (timestamps.has(message.author.id)) {
+                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+                if (now < expirationTime) {
+                    const timeLeft = (expirationTime - now) / 1000;
+                    return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                }
+            }
 
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-        }
-    }
+            timestamps.set(message.author.id, now);
+            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-    try {
-        command.execute(message, args);
-    } catch (error) {
-        console.error(error);
-        message.reply('there was an error trying to execute that command!');
-    }
+            try {
+                command.execute(message, args);
+            } catch (error) {
+                console.error(error);
+                message.reply('there was an error trying to execute that command!').then(() => {return;});
+            }
+        })
+        .catch(console.error)
 })
 
 client.on('ready', () => {
@@ -88,13 +98,11 @@ client.on('ready', () => {
 });
 
 client.login(bot_token)
-    .then(r => {
-        if (!r)
-            throw err;
+    .then((r, error) => {
+        if (error)
+            throw error;
     })
-    .catch(err => {
-        console.log(err);
-    });
+    .catch(console.error);
 
 mongoose.connect('mongodb://localhost:27017', {useNewUrlParser: true});
 

@@ -4,6 +4,6 @@ module.exports = {
     guildOnly: true,
     cooldown: 3,
     execute(message, args) {
-        message.channel.send('Mute user intent.');
+        message.channel.send('I have detected that you want to mute a user named ' + args);
     },
 };
