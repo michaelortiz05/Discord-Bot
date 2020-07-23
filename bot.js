@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const userController = require('./src/controllers/user.controller');
 const Discord = require('discord.js');
 const {Wit, log} = require('node-wit');
 const fs = require('fs');
@@ -39,9 +40,24 @@ client.on('message', message => {
         });
     }
 
-    // Only command not in handler
+    // add user to database
+    if (message.content.startsWith("!add")) {
+        const args = message.content.slice(4).trim().split(' ');
+        var id = args.shift();
+        id = id.substring(3, id.length - 1);
+        if (!message.guild.members.cache.has(id)) {
+            message.channel.send("Cannot find that user")
+                .then(() => {return;})
+                .catch(err => { console.error(err);});
+        }
+        else {
+            userController.create(message, id, args);
+        }
+        return;
+    }
+
     if (message.content === '!logout') {
-        message.channel.send('Logging off.').then(r => {
+        message.channel.send('Logging off').then(r => {
             client.destroy();
         });
         return;
