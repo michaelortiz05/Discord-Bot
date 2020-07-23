@@ -27,7 +27,8 @@ for (const file of commandFiles) {
     const command = require('./src/commands/' + file);
     client.commands.set(command.name, command);
 }
-
+var connection;
+var audio; //= connection.reciever.createStream("281229936746823691", {mode: "pcm"});
 // Handle bot commands
 client.on('message', message => {
     //console.log(message.member.roles.cache);
@@ -55,7 +56,14 @@ client.on('message', message => {
         }
         return;
     }
-
+    if (message.content === "!summon") {
+        if (message.member.voice.channel) {
+            connection = message.member.voice.channel.join();
+       //     audio = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+        }
+        else return;
+    }
+    // logout
     if (message.content === '!logout') {
         message.channel.send('Logging off').then(r => {
             client.destroy();
