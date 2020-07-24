@@ -5,7 +5,7 @@ const {Wit, log} = require('node-wit');
 const fs = require('fs');
 
 // Get sensitive configurations
-const {bot_token, wit_token} = require('./config.json');
+const {bot_token, wit_token, emperor_id} = require('./config.json');
 
 // Authenticate wit
 const wit_client = new Wit({
@@ -27,18 +27,28 @@ for (const file of commandFiles) {
     const command = require('./src/commands/' + file);
     client.commands.set(command.name, command);
 }
-var connection;
-var audio; //= connection.reciever.createStream("281229936746823691", {mode: "pcm"});
+var connection = undefined;
+//var audio; //= connection.reciever.createStream("281229936746823691", {mode: "pcm"});
 // Handle bot commands
+client.on('guildMemberSpeaking', (member, speaking) => {
+    if (connection === undefined) return;
+    if (member.id != '281229936746823691') return;
+    const audio = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+    audio.pipe(fs.createWriteStream('user_audio'));
+
+    wit_client.
+})
 client.on('message', message => {
     //console.log(message.member.roles.cache);
     if (message.author == client.user) return;
+    //if(message.channel.id != '735632215224090635') return;
 
     // Restrict who can use the bot
-    if (!message.member.roles.cache.has('447204257268236289')) { // Change for empire upon deployment
+    if (!message.member.roles.cache.has('447204257268236289')) { // Change for empire upon deployment 447204257268236289
         message.channel.send('Sorry, you do not have access to this bot!').then(() => {
             return;
         });
+        return;
     }
 
     // add user to database
@@ -59,10 +69,11 @@ client.on('message', message => {
     if (message.content === "!summon") {
         if (message.member.voice.channel) {
             connection = message.member.voice.channel.join();
-       //     audio = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+
         }
         else return;
     }
+
     // logout
     if (message.content === '!logout') {
         message.channel.send('Logging off').then(r => {
