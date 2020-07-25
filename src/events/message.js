@@ -27,7 +27,16 @@ module.exports = async (client, message) => {
     else if (message.content === "!summon") {
         if (message.member.voice.channel) {
             // console.log("here");
-            const connection = await join(message.member.voice.channel);
+            const connection = await message.member.voice.channel.join();
+            const dispatcher = connection.play("E:\\Michael Ortiz\\IdeaProjects\\discord_bot\\src\\audio\\start.mp3", {volume: 0.5});
+            dispatcher.on('start', () => {
+                console.log('audio.mp3 is now playing!');
+            });
+            dispatcher.on('finish', () => {
+                console.log("finished");
+                dispatcher.destroy();
+            })
+            dispatcher.on('error', console.error);
             /*then(() => {
 
                 console.log("Member joined");
@@ -90,11 +99,7 @@ module.exports = async (client, message) => {
             .catch(console.error)
     }*/
     // process message
-    function join(voiceChannel) {
-       voiceChannel.join().then(connected => {
-          console.log("connected to voice");
-          return connected;
-      //    return connected;
-      });
-   }
+   /* function join(voiceChannel) {
+       return voiceChannel.join();
+   }*/
 }

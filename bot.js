@@ -24,6 +24,7 @@ client.login(bot_token)
     })
     .catch(console.error);
 
+
 // Create command handler and cooldown handler
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
