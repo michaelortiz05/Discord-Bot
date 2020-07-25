@@ -17,6 +17,7 @@
     "mongoose": "^5.9.25",
     "node-wit": "^6.0.0",
     "axios": "^0.19.2",
-    "require-all": "^3.0.0"
+    "require-all": "^3.0.0",
+    "path": "^0.12.7"
   }
 }

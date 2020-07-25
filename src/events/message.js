@@ -1,3 +1,4 @@
+const path = require('path');
 module.exports = async (client, message) => {
     if (message.author == client.user);
     else if (message.author.bot);
@@ -28,7 +29,7 @@ module.exports = async (client, message) => {
         if (message.member.voice.channel) {
             // console.log("here");
             const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play("E:\\Michael Ortiz\\IdeaProjects\\discord_bot\\src\\audio\\start.mp3", {volume: 0.5});
+            const dispatcher = connection.play(path.join(__dirname,"../audio/start.mp3"), {volume: 0.5});
             dispatcher.on('start', () => {
                 console.log('audio.mp3 is now playing!');
             });
