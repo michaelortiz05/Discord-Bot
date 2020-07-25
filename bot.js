@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const userController = require('./src/controllers/user.controller');
 const Discord = require('discord.js');
-const axios = require('axios');
+
 const requireAll = require('require-all');
 const {Wit, log} = require('node-wit');
 const fs = require('fs');
