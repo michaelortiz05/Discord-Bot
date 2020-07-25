@@ -1,3 +1,4 @@
+
 module.exports = (client, member, speaking) => {
     console.log("here");
     if (speaking) {

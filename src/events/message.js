@@ -27,9 +27,11 @@ module.exports = async (client, message) => {
     else if (message.content === "!summon") {
         if (message.member.voice.channel) {
             // console.log("here");
-            await join(message.member.voice.channel).then(() => {
+            const connection = await join(message.member.voice.channel);
+            /*then(() => {
+
                 console.log("Member joined");
-            });
+            });*/
         }
         // return;
     }
@@ -88,7 +90,11 @@ module.exports = async (client, message) => {
             .catch(console.error)
     }*/
     // process message
-    async function join(voiceChannel) {
-        await voiceChannel.join();
-    }
+    function join(voiceChannel) {
+       voiceChannel.join().then(connected => {
+          console.log("connected to voice");
+          return connected;
+      //    return connected;
+      });
+   }
 }

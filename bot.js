@@ -17,6 +17,12 @@ const wit_client = new Wit({
 
 // Start discord client
 const client = new Discord.Client();
+client.login(bot_token)
+    .then((r, error) => {
+        if (error)
+            throw error;
+    })
+    .catch(console.error);
 
 // Create command handler and cooldown handler
 client.commands = new Discord.Collection();
@@ -84,12 +90,6 @@ client.on('ready', async () => {
 
 });
 
-client.login(bot_token)
-    .then((r, error) => {
-        if (error)
-            throw error;
-    })
-    .catch(console.error);
 
 mongoose.connect('mongodb://localhost:27017', {useNewUrlParser: true, useUnifiedTopology: true});
 
