@@ -12,9 +12,11 @@
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
     "discord.js": "^12.2.0",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-static": "^4.2.6",
     "mongoose": "^5.9.25",
     "node-wit": "^6.0.0",
-    "ffmpeg-static": "^4.2.6",
-    "ffmpeg": "^0.0.4"
+    "axios": "^0.19.2",
+    "require-all": "^3.0.0"
   }
 }

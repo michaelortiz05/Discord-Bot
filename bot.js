@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const userController = require('./src/controllers/user.controller');
 const Discord = require('discord.js');
+const axios = require('axios');
+const requireAll = require('require-all');
 const {Wit, log} = require('node-wit');
 const fs = require('fs');
 
@@ -27,109 +29,59 @@ for (const file of commandFiles) {
     const command = require('./src/commands/' + file);
     client.commands.set(command.name, command);
 }
-var connection = undefined;
-//var audio; //= connection.reciever.createStream("281229936746823691", {mode: "pcm"});
-// Handle bot commands
-client.on('guildMemberSpeaking', (member, speaking) => {
-    if (connection === undefined) return;
-    if (member.id != '281229936746823691') return;
-    const audio = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+const files = requireAll({                   // Require all the files within your
+    dirname: `${__dirname}/src/events`,            // event directory which have a name
+    filter: /^(?!-)(.+)\.js$/                  // ending in '.js' NOT starting
+});                                          // with '-' (a way to disable files).
+
+client.removeAllListeners();                 // Prevent duplicate listeners on reload.
+                                             // CAUTION: THIS REMOVES LISTENERS
+                                             // ATTACHED BY DISCORD.JS!
+
+for (const name in files) {                  // Iterate through the files object
+    const event = files[name];                 // and attach listeners to each
+                                               // event, passing 'client' as the
+    client.on(name, event.bind(null, client)); // first parameter, and the rest
+                                               // of the expected parameters
+    console.log(`Event loaded: ${name}`);      // afterwards. Then, log the
+}
+
+/*client.on('guildMemberSpeaking',  (member, speaking) => {
+
+    /*
+    const audio = client.voice.connections[0].receiver.createStream("281229936746823691", {mode: "pcm"});
     audio.pipe(fs.createWriteStream('user_audio'));
-
-    wit_client.
-})
-client.on('message', message => {
-    //console.log(message.member.roles.cache);
-    if (message.author == client.user) return;
-    //if(message.channel.id != '735632215224090635') return;
-
-    // Restrict who can use the bot
-    if (!message.member.roles.cache.has('447204257268236289')) { // Change for empire upon deployment 447204257268236289
-        message.channel.send('Sorry, you do not have access to this bot!').then(() => {
-            return;
-        });
-        return;
-    }
-
-    // add user to database
-    if (message.content.startsWith("!add")) {
-        const args = message.content.slice(4).trim().split(' ');
-        var id = args.shift();
-        id = id.substring(3, id.length - 1);
-        if (!message.guild.members.cache.has(id)) {
-            message.channel.send("Cannot find that user")
-                .then(() => {return;})
-                .catch(err => { console.error(err);});
+    axios({
+        method: 'post',
+        url: 'https://api.wit.ai/speech',
+        headers: {
+            'Authorization': "Bearer " + wit_token,
+            'Content-Type': "audio/raw"
+        },
+        params: {
+            'encoding': 'signed-integer',
+            'bits': 16,
+            'rate': '48000',
+            'endian': 'little'
+        },
+        data: {
+            binary: "user_audio"
         }
-        else {
-            userController.create(message, id, args);
-        }
-        return;
-    }
-    if (message.content === "!summon") {
-        if (message.member.voice.channel) {
-            connection = message.member.voice.channel.join();
+    }).then(function(response) {
+        console.log(response.data);
+        console.log(response.status);
+        console.log(response.statusText);
+        console.log(response.headers);
+        console.log(response.config);
+    });
 
-        }
-        else return;
-    }
+});*/
 
-    // logout
-    if (message.content === '!logout') {
-        message.channel.send('Logging off').then(r => {
-            client.destroy();
-        });
-        return;
-    }
-    // process message
-    var commandName = message; // TEMPORARY
-    var args = ""; // Temporary
-    wit_client.message(message)
-        .then((data) => {
-            commandName = data["intents"][0]["name"];
-            args = data["entities"]["user:user"][0]["body"];
-            console.log(commandName)
 
-            if (!client.commands.has(commandName)) return;
 
-            const command = client.commands.get(commandName);
-
-            if (command.guildOnly && message.channel.type !== 'text') {
-                return message.reply('I can\'t execute that command inside DMs!');
-            }
-
-            if (!cooldowns.has(command.name)) {
-                cooldowns.set(command.name, new Discord.Collection());
-            }
-
-            const now = Date.now();
-            const timestamps = cooldowns.get(command.name);
-            const cooldownAmount = (command.cooldown || 3) * 1000;
-
-            if (timestamps.has(message.author.id)) {
-                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-                if (now < expirationTime) {
-                    const timeLeft = (expirationTime - now) / 1000;
-                    return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                }
-            }
-
-            timestamps.set(message.author.id, now);
-            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-            try {
-                command.execute(message, args);
-            } catch (error) {
-                console.error(error);
-                message.reply('there was an error trying to execute that command!').then(() => {return;});
-            }
-        })
-        .catch(console.error)
-})
-
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
 });
 
 client.login(bot_token)
