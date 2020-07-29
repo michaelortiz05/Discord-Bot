@@ -9,11 +9,12 @@ const fs = require('fs');
 // Get sensitive configurations
 const {bot_token, wit_token, emperor_id} = require('./config.json');
 
+//module.exports = {voice_settings};
 // Authenticate wit
-const wit_client = new Wit({
+/*const wit_client = new Wit({
     accessToken: wit_token,
     logger: new log.Logger(log.DEBUG)
-});
+}); */
 
 // Start discord client
 const client = new Discord.Client();

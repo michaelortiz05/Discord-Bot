@@ -12,8 +12,11 @@
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
     "discord.js": "^12.2.0",
+    "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.6",
+    "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.9.26",
+    "node-opus": "^0.3.3",
     "node-wit": "^6.0.0",
     "node-witai-speech": "~1.0.2",
     "path": "^0.12.7",
