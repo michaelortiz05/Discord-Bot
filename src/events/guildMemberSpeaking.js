@@ -1,7 +1,9 @@
 //const axios = require('axios');
+//const https = require('https');
 const fs = require('fs');
+const WitSpeech = require('node-witai-speech');
 const {wit_token} = require('../../config.json');
-const FileWriter = require("wav").FileWriter;
+//const FileWriter = require("wav").FileWriter;
 //console.log(wit_token);
 module.exports = async (client, member, speaking) => {
     if (speaking) {
@@ -12,18 +14,38 @@ module.exports = async (client, member, speaking) => {
     if (member.id != '281229936746823691') {console.log("Wrong user");return;}
 
     const audio = client.voice.connections.get('447204257268236289').receiver.createStream("281229936746823691", {mode: "pcm"}); // change hard-code
-    await audio.pipe(fs.createWriteStream('user_audio'));
+    var writeStream = fs.createWriteStream('user_audio')
+    await audio.pipe(writeStream);
+    //await audio.pipe(fs.createWriteStream('user_audio'));
+    var stream = fs.createReadStream('user_audio');
+    var content_type = "audio/raw";
+    var parseSpeech =  new Promise((resolve, reject) => {
+        // call the wit.ai api with the created stream
+        WitSpeech.extractSpeechIntent(wit_token, stream, content_type,
+            (err, res) => {
+                if (err) return reject(err);
+                resolve(res);
+            });
+    });
+
+// check in the promise for the completion of call to witai
+    parseSpeech.then((data) => {
+        console.log(data);
+    })
+        .catch((err) => {
+            console.log(err);
+        });
     /*var outputFileStream = new FileWriter('audio.wav', {
         sampleRate: 48000,
         channels: 2
     });*/
   //  audio.pipe(outputFileStream);
-    axios({
+    /*axios({
         method: 'post',
         url: 'https://api.wit.ai/speech?v=20200513',
         headers: {
-            Authorization: "Bearer " + wit_token,
-            'Content-Type': "raw"
+            'Authorization': "Bearer " + wit_token,
+            'Content-Type': "audio/raw"
         },
         params: {
             'encoding': 'signed-integer',
@@ -42,7 +64,7 @@ module.exports = async (client, member, speaking) => {
         console.log(response.config);
     }).catch(err => {
         console.error(err);
-    });
+    }); */
 
     //while (speaking);
     /*fs.readFile(`user_audio`, function(err, result) {
