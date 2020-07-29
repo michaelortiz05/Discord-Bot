@@ -13,7 +13,8 @@ var global = require('../../global');
 module.exports =  (client, member, speaking) => {
     // Close the writeStream when a member stops speaking
    // console.log("SPEAKING");
-    if (!speaking) { //!speaking && global.voice_settings.voiceChannel
+    //console.log(speaking.bitfield === 0);
+    if (speaking.bitfield === 0 && global.voice_settings.voiceChannel) { //!speaking && global.voice_settings.voiceChannel
    //     console.log("not speaking");
         let stream = global.voice_settings.listenStreams.get(member.id);
         if (stream) {
@@ -158,7 +159,7 @@ function processRawToWav(filepath, outputpath, cb) {
 
             // check in the promise for the completion of call to witai
             parseSpeech.then((data) => {
-                console.log("you said: " + data._text);
+                console.log(data);
                 cb(data);
                 //return data;
             })
