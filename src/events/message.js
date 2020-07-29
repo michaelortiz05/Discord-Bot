@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 var global = require('../../global');
-module.exports = async (client, message) => {
+module.exports =  (client, message) => {
     if (message.author == client.user);
     else if (message.author.bot);
         //else if(message.channel.id != '735632215224090635');
@@ -40,25 +40,31 @@ module.exports = async (client, message) => {
             global.voice_settings.voiceChannel.join().then((connection) => {
                 //listenConnection.set(member.voiceChannelId, connection);
                 global.voice_settings.listenConnection = connection;
-                global.voice_settings.dipsatcher = connection.play(path.join(__dirname,"../audio/start.mp3"), {volume: 0.5});
+                global.voice_settings.dipsatcher = connection.play(path.join(__dirname, "../audio/start.mp3"), {volume: 0.5});
                 /*(global.voice_settings.dispatcher.on('start', () => {
-                    console.log('audio.mp3 is now playing!');
+                   console.log('audio.mp3 is now playing!');
                 });
                 global.voice_settings.dispatcher.on('finish', () => {
                     console.log("finished playing");
                     global.voice_settings.dispatcher.destroy();
                 });
                 global.voice_settings.dispatcher.on('error', console.error); */
-                var receiver = connection.receiver.createStream("281229936746823691",{mode: "opus"});
+                let receiver = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+                global.voice_settings.listenReceiver = receiver;
+            });
+        }
+    }
               //  console.log("making reciever");
-                global.voice_settings.listenConnection.on('speaking', function(user, data) {
+                /*global.voice_settings.listenConnection.on('speaking', function(user, data) {
               //      console.log("EVENT");
                     let hexString = data.toString('hex');
+                    console.log(hexString);
                     let stream = global.voice_settings.listenStreams.get(user.id);
                     if (!stream) {
                         if (hexString === 'f8fffe') {
                             return;
                         }
+
                         let outputPath = path.join(recordingsPath, `${user.id}-${Date.now()}.opus_string`);
                         stream = fs.createWriteStream(outputPath);
                         global.voice_settings.listenStreams.set(user.id, stream);
@@ -68,7 +74,7 @@ module.exports = async (client, message) => {
                 //listenReceiver.set(member.voiceChannelId, receiver);
                 global.voice_settings.listenReceiver = receiver;
             }).catch(console.error);
-        }
+        }/*
             // console.log("here");
             /*const connection = await message.member.voice.channel.join();
             const dispatcher = connection.play(path.join(__dirname,"../audio/start.mp3"), {volume: 0.5});
@@ -84,7 +90,7 @@ module.exports = async (client, message) => {
 
                 console.log("Member joined");
             });*/
-        }
+   //     }
         // return;
 
     // logout
@@ -144,7 +150,8 @@ module.exports = async (client, message) => {
    /* function join(voiceChannel) {
        return voiceChannel.join();
    }*/
-}
+    }
+
 function makeDir(dir) {
     try {
         fs.mkdirSync(dir);
