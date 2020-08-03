@@ -12,11 +12,32 @@ var global = require('../../global');
 //console.log(wit_token);
 module.exports =  (client, member, speaking) => {
     // Close the writeStream when a member stops speaking
-   // console.log("SPEAKING");
-    //console.log(speaking.bitfield === 0);
-    if (speaking.bitfield === 0 && global.voice_settings.voiceChannel) { //!speaking && global.voice_settings.voiceChannel
+     //console.log("SPEAKING");
+  //  console.log(speaking.bitfield === 1);
+    if (speaking.bitfield === 1 && global.voice_settings.voiceChannel != null && global.voice_settings.listenConnection != null && member.id === "281229936746823691") {
+        console.log("Speaking detected");
+        let receiver = global.voice_settings.listenConnection.receiver.createStream("281229936746823691", {mode: "pcm"});
+        receiver.pipe(fs.createWriteStream('user_audio'));
+        receiver.on('end', function() {
+            processRawToWav('user_audio', 'user_audio_p.wav', function (data) {
+                if (data != null) {
+                    console.log('YAY!');
+                }
+            });
+        });
+        receiver.on('error', (error) => {
+            console.error(error);
+        });
+        receiver.on('exit', (code) => {
+            console.log(code);
+        });
+    }
+
+
+
+        //!speaking && global.voice_settings.voiceChannel
    //     console.log("not speaking");
-        let stream = global.voice_settings.listenStreams.get(member.id);
+        /*let stream = global.voice_settings.listenStreams.get(member.id);
         if (stream) {
             global.voice_settings.listenStreams.delete(member.id);
             stream.end(err => {
@@ -40,10 +61,11 @@ module.exports =  (client, member, speaking) => {
                                     console.log("YAY!");
                                 }
                             }).bind(this))
-                    }).bind(this));
-            });
-        }
-    }
+                    }).bind(this));*/
+          //  });
+      //  }
+
+
    /* if (speaking) {
         console.log("speaking");
     }
@@ -139,11 +161,12 @@ function processRawToWav(filepath, outputpath, cb) {
     fs.closeSync(fs.openSync(outputpath, 'w'));
     var command = ffmpeg(filepath)
         .addInputOptions([
-            '-f s32le',
+            '-f s16le',
             '-ar 48k',
-            '-ac 1'
+            '-ac 2'
         ])
         .on('end', function() {
+            console.log("end");
             // Stream the file to be sent to the wit.ai
             var stream = fs.createReadStream(outputpath);
 

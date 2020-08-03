@@ -34,11 +34,11 @@ module.exports =  (client, message) => {
             console.log("Voice setting: " + global.voice_settings.listening);
             global.voice_settings.voiceChannel = message.member.voice.channel;
             message.channel.send("Listening to " + message.member.voice.channel.name);
-            var recordingsPath = path.join('.', 'recordings');
-            makeDir(recordingsPath);
+           // var recordingsPath = path.join('.', 'recordings');
+           // makeDir(recordingsPath);
 
             global.voice_settings.voiceChannel.join().then((connection) => {
-                //listenConnection.set(member.voiceChannelId, connection);
+               // global.voice_settings.listenConnection.set(member.voiceChannelId, connection);
                 global.voice_settings.listenConnection = connection;
                 global.voice_settings.dipsatcher = connection.play(path.join(__dirname, "../audio/start.mp3"), {volume: 0.5});
                 /*(global.voice_settings.dispatcher.on('start', () => {
@@ -49,8 +49,10 @@ module.exports =  (client, message) => {
                     global.voice_settings.dispatcher.destroy();
                 });
                 global.voice_settings.dispatcher.on('error', console.error); */
-                let receiver = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
-                global.voice_settings.listenReceiver = receiver;
+             //   let receiver = connection.receiver.createStream("281229936746823691", {mode: "pcm"});
+              //  global.voice_settings.listenReceiver = receiver;
+              //  global.voice_settings.listenStream =
+              //  global.voice_settings.listenReceiver.pipe(fs.createWriteStream('user_audio'));
             });
         }
     }
