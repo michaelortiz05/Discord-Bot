@@ -1,3 +1,5 @@
 config.json
 node_modules/
 recordings/
+user_audio
+user_audio_p.wav

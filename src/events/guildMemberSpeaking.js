@@ -21,7 +21,27 @@ module.exports =  (client, member, speaking) => {
         receiver.on('end', function() {
             processRawToWav('user_audio', 'user_audio_p.wav', function (data) {
                 if (data != null) {
-                    console.log('YAY!');
+                    var text = data.text; // TEMPORARY
+                   // var args = ""; // Temporary
+
+                    if (!text.startsWith('hey bot'));
+                    else {
+                        var commandName = data["intents"][0]["name"];
+                        var args = data["entities"]["user:user"][0]["body"];
+                     //   console.log('args: ' + args);
+                        if (!client.commands.has(commandName)) return;
+
+                        const command = client.commands.get(commandName);
+                        const guild = client.guilds.cache.get("447204257268236289");
+                        console.log(guild);
+                        const channel = guild.channels.cache.get("675018486552068097");
+                        try {
+                            command.execute(args, guild, channel);
+                        } catch (error) {
+                            console.error(error);
+                        //    message.reply('there was an error trying to execute that command!').then(() => {return;});
+                        }
+                    }
                 }
             });
         });
@@ -157,6 +177,56 @@ module.exports =  (client, member, speaking) => {
     //wav.encode(stream, {sampleRate: 48000, float: true, bitDepth: 32 }).pipe(fs.createWriteStream('audio.wav'));
 
 }
+/*function processCommand(client, data) {
+    var text = data.text; // TEMPORARY
+    var args = ""; // Temporary
+    /*else {
+        var commandName = message; // TEMPORARY
+        var args = ""; // Temporary
+        wit_client.message(message)
+            .then((data) => {
+                commandName = data["intents"][0]["name"];
+                args = data["entities"]["user:user"][0]["body"];
+                console.log(commandName)
+
+                if (!client.commands.has(commandName)) return;
+
+                const command = client.commands.get(commandName);
+
+                if (command.guildOnly && message.channel.type !== 'text') {
+                    return message.reply('I can\'t execute that command inside DMs!');
+                }
+
+                if (!cooldowns.has(command.name)) {
+                    cooldowns.set(command.name, new Discord.Collection());
+                }
+
+                const now = Date.now();
+                const timestamps = cooldowns.get(command.name);
+                const cooldownAmount = (command.cooldown || 3) * 1000;
+
+                if (timestamps.has(message.author.id)) {
+                    const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+                    if (now < expirationTime) {
+                        const timeLeft = (expirationTime - now) / 1000;
+                        return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                    }
+                }
+
+                timestamps.set(message.author.id, now);
+                setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
+                try {
+                    command.execute(message, args);
+                } catch (error) {
+                    console.error(error);
+                    message.reply('there was an error trying to execute that command!').then(() => {return;});
+                }
+            })
+            .catch(console.error)
+    }*/
+//}
 function processRawToWav(filepath, outputpath, cb) {
     fs.closeSync(fs.openSync(outputpath, 'w'));
     var command = ffmpeg(filepath)
