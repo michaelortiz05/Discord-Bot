@@ -4,7 +4,7 @@ const path = require('path');
 const decode = require('../../decodeOpus');
 const fs = require('fs');
 const WitSpeech = require('node-witai-speech');
-const {wit_token} = require('../../config.json');
+const {wit_token, guild_channel_maps} = require('../../config.json');
 const ffmpeg = require('fluent-ffmpeg');
 const content_type = "audio/wav";
 var global = require('../../global');
@@ -32,9 +32,9 @@ module.exports =  (client, member, speaking) => {
                         if (!client.commands.has(commandName)) return;
 
                         const command = client.commands.get(commandName);
-                        const guild = client.guilds.cache.get("447204257268236289");
-                        console.log(guild);
-                        const channel = guild.channels.cache.get("675018486552068097");
+                        const guild = member.guild;//client.guilds.cache.get("390964580333125632"); // 447204257268236289
+                        console.log(guild.id);
+                        const channel = guild_channel_maps[guild.id];//guild.channels.cache.get("390967739906260992"); // 675018486552068097
                         try {
                             command.execute(args, guild, channel);
                         } catch (error) {

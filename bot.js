@@ -7,7 +7,7 @@ const {Wit, log} = require('node-wit');
 const fs = require('fs');
 
 // Get sensitive configurations
-const {bot_token, wit_token, emperor_id} = require('./config.json');
+const {bot_token} = require('./config.json');
 
 //module.exports = {voice_settings};
 // Authenticate wit
@@ -28,7 +28,7 @@ client.login(bot_token)
 
 // Create command handler and cooldown handler
 client.commands = new Discord.Collection();
-const cooldowns = new Discord.Collection();
+//const cooldowns = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
