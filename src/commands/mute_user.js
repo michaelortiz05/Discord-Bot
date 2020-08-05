@@ -5,7 +5,7 @@ module.exports = {
     description: 'mutes a given user.',
     guildOnly: true,
     cooldown: 3,
-    execute(args, guild, channel) {
+    execute_voice(args, guild, channel) {
      //   message.channel.send('I have detected that you want to mute a user named ' + args);
         userController.findOne({aliases: {"$regex": args , "$options": "i"}})
             .then(r => {

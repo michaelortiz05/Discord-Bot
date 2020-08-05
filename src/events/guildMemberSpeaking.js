@@ -4,7 +4,7 @@ const path = require('path');
 const decode = require('../../decodeOpus');
 const fs = require('fs');
 const WitSpeech = require('node-witai-speech');
-const {wit_token, guild_channel_maps} = require('../../config.json');
+const {wit_token, guild_channel_maps, bot_admin} = require('../../config.json');
 const ffmpeg = require('fluent-ffmpeg');
 const content_type = "audio/wav";
 var global = require('../../global');
@@ -14,16 +14,16 @@ module.exports =  (client, member, speaking) => {
     // Close the writeStream when a member stops speaking
      //console.log("SPEAKING");
   //  console.log(speaking.bitfield === 1);
-    if (speaking.bitfield === 1 && global.voice_settings.voiceChannel != null && global.voice_settings.listenConnection != null && member.id === "281229936746823691") {
+    if (speaking.bitfield === 1 && global.voice_settings.voiceChannel != null && global.voice_settings.listenConnection != null && member.id === bot_admin) {
         console.log("Speaking detected");
-        let receiver = global.voice_settings.listenConnection.receiver.createStream("281229936746823691", {mode: "pcm"});
+        let receiver = global.voice_settings.listenConnection.receiver.createStream(bot_admin, {mode: "pcm"});
         receiver.pipe(fs.createWriteStream('user_audio'));
         receiver.on('end', function() {
             processRawToWav('user_audio', 'user_audio_p.wav', function (data) {
                 if (data != null) {
                     var text = data.text; // TEMPORARY
                    // var args = ""; // Temporary
-
+                    if (text === undefined) return;
                     if (!text.startsWith('hey bot'));
                     else {
                         var commandName = data["intents"][0]["name"];
@@ -36,7 +36,7 @@ module.exports =  (client, member, speaking) => {
                         console.log(guild.id);
                         const channel = guild_channel_maps[guild.id];//guild.channels.cache.get("390967739906260992"); // 675018486552068097
                         try {
-                            command.execute(args, guild, channel);
+                            command.execute_voice(args, guild, channel);
                         } catch (error) {
                             console.error(error);
                         //    message.reply('there was an error trying to execute that command!').then(() => {return;});
