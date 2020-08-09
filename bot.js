@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const userController = require('./src/controllers/user.controller');
+//const userController = require('./src/controllers/user.controller');
 const Discord = require('discord.js');
 
 const requireAll = require('require-all');
-const {Wit, log} = require('node-wit');
+
 const fs = require('fs');
 
 // Get sensitive configurations

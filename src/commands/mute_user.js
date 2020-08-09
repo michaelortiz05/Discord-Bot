@@ -41,7 +41,8 @@ module.exports = {
                 }
             });
     },
-   /* execute(args, message) {
+    execute(message, args) {
+        console.log("here!");
         userController.findOne({aliases: {"$regex": args , "$options": "i"}})
             .then(r => {
                 if(!r) {
@@ -76,5 +77,5 @@ module.exports = {
                         }).catch(error => {console.error(error);});
                 }
             });
-        },*/
+        },
     }
