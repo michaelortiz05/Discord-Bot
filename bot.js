@@ -54,38 +54,6 @@ for (const name in files) {                  // Iterate through the files object
     console.log(`Event loaded: ${name}`);      // afterwards. Then, log the
 }
 
-/*client.on('guildMemberSpeaking',  (member, speaking) => {
-
-    /*
-    const audio = client.voice.connections[0].receiver.createStream("281229936746823691", {mode: "pcm"});
-    audio.pipe(fs.createWriteStream('user_audio'));
-    axios({
-        method: 'post',
-        url: 'https://api.wit.ai/speech',
-        headers: {
-            'Authorization': "Bearer " + wit_token,
-            'Content-Type': "audio/raw"
-        },
-        params: {
-            'encoding': 'signed-integer',
-            'bits': 16,
-            'rate': '48000',
-            'endian': 'little'
-        },
-        data: {
-            binary: "user_audio"
-        }
-    }).then(function(response) {
-        console.log(response.data);
-        console.log(response.status);
-        console.log(response.statusText);
-        console.log(response.headers);
-        console.log(response.config);
-    });
-
-});*/
-
-
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);

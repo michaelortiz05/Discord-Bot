@@ -1,3 +1,5 @@
+const userController = require('../models/user.model');
+
 module.exports = {
     name: 'simpify_user',
     description: 'gives a user the simp role.',
