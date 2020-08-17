@@ -42,7 +42,6 @@ module.exports = {
             });
     },
     execute(message, args) {
-        console.log("here!");
         userController.findOne({aliases: {"$regex": args , "$options": "i"}})
             .then(r => {
                 if(!r) {

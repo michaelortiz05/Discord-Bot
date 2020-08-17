@@ -12,7 +12,7 @@ const wit_client = new Wit({
 module.exports =  (client, message) => {
     if (message.author == client.user) return;
     else if (message.author.bot) return;
-    else if (!validate_channel(message)) ;
+    else if (!validate_channel(message)) return;
 
     // Restrict who can use the bot
     else if (!validate_role(message)) {
