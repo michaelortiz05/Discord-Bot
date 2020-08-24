@@ -19,7 +19,7 @@ module.exports = {
                                 console.log("Could not find user")
                                 channel.send("Sorry! Could not find user!")
                             } else {
-                                user.voice.setMute(true, "for being a cunt")
+                                user.voice.setMute(true, "REASON")
                                     .then(result => {
                                         if (!result) {
                                             console.error("unable to mute");
