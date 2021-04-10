@@ -9,5 +9,5 @@ Instructions for use (linux)
 3. Install Node.js
 4. View package.json, install all dependencies through npm
 5. Install MongoDB client - see debian instructions
-6. Contact admin for config.json
+6. Contact admin for config.json (or use your own!)
 7. Run bot :)
