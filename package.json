@@ -22,6 +22,7 @@
     "path": "^0.12.7",
     "require-all": "^3.0.0",
     "underscore": "^1.10.2",
-    "snoowrap": "^1.22.0"
+    "snoowrap": "^1.22.0",
+    "scripture-api": "^1.0.3"
   }
 }
