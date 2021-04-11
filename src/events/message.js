@@ -2,7 +2,7 @@ const path = require('path');
 //const fs = require('fs');
 const {Wit, log} = require('node-wit');
 const userController = require('../controllers/user.controller');
-const {wit_token,allowed_users, message_channels, roles} = require('../../config');
+const {wit_token, message_channels, roles} = require('../../config');
 var global = require('../../global');
 
 const wit_client = new Wit({
