@@ -25,5 +25,8 @@
     "scripture-api": "^1.0.3",
     "snoowrap": "^1.22.0",
     "underscore": "^1.10.2"
+  },
+  "devDependencies": {
+    "canvas": "^2.7.0"
   }
 }

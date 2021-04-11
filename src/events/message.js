@@ -1,5 +1,6 @@
 const path = require('path');
 //const fs = require('fs');
+const Canvas = require('canvas');
 const {Wit, log} = require('node-wit');
 const ScriptureApi = require('scripture-api');
 const jsdom = require("jsdom");
@@ -7,6 +8,7 @@ const https = require('https');
 const userController = require('../controllers/user.controller');
 const {wit_token, scripture_token, message_channels, roles} = require('../../config');
 var global = require('../../global');
+const Discord = require("discord.js");
 
 const scriptureApi = new ScriptureApi(scripture_token); // Temp, will move when nlp functionalilty added
 
@@ -17,16 +19,17 @@ const wit_client = new Wit({
 
 const { JSDOM } = jsdom;
 
-module.exports =  (client, message) => {
+module.exports = (client, message) => {
     if (message.author == client.user) return;
     else if (message.author.bot) return;
     else if (!validate_channel(message)) return;
 
     // Restrict who can use the bot
     else if (!validate_role(message)) {
-        message.channel.send('Sorry, you do not have access to this bot!').then(() => {
+      /*  message.channel.send('Sorry, you do not have access to this bot!').then(() => {
             console.log("Access restricted");
-        });
+        });*/
+        return;
     }
 
     // debug
@@ -107,7 +110,7 @@ module.exports =  (client, message) => {
                                         data += d;
                                     })
 
-                                    res.on('end', d => {
+                                    res.on('end', async d => {
                                         let obj = JSON.parse(data);
                                         console.log(obj['data']['content'] + "\n\n");
                                         const readingDom = new JSDOM(obj['data']['content']);
@@ -118,7 +121,52 @@ module.exports =  (client, message) => {
                                        // console.log(verseText);
                                         let ref = obj['data']['reference'];
                                         console.log(obj)
-                                        message.channel.send(verseText + "\n" + ref)
+
+                                        // Draw canvas
+                                        const canvas = Canvas.createCanvas(700, 600);
+                                        const ctx = canvas.getContext('2d');
+                                        let imageDir = path.resolve(__dirname, '..', 'images');
+                                        imageDir = path.join(imageDir, 'banff.jpg');
+                                        console.log(imageDir);
+                                        const background = await Canvas.loadImage(imageDir);
+                                        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+                                        // outline
+                                        ctx.strokeStyle = '#38f';
+                                        ctx.shadowColor = '#d53';
+                                       // ctx.shadowBlur = 20;
+                                        ctx.lineWidth = 15;
+                                        ctx.lineJoin = 'bevel';
+
+                                        // Draw a rectangle with the dimensions of the entire canvas
+                                        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+                                        // text
+                                        const applyText = (canvas, text) => {
+                                            const ctx = canvas.getContext('2d');
+
+                                            // Declare a base size of the font
+                                            let fontSize = 100;
+
+                                            do {
+                                                // Assign the font to the context and decrement it so it can be measured again
+                                                ctx.font = `${fontSize -= 10}px sans-serif`;
+                                                // Compare pixel width of the text to the canvas minus the approximate avatar size
+                                            } while (ctx.measureText(text).width > canvas.width - 80);
+
+                                            // Return the result to use in the actual canvas
+                                            return ctx.font;
+                                        };
+                                        ctx.font = '45px sans-serif';
+                                        // Select the style that will be used to fill the text in
+                                        ctx.fillStyle = '#ffffff';
+                                        // Actually fill the text with a solid color
+                                        ctx.fillText("TEST TEST TEEEEEEEEEEEEEST", 80, canvas.width/3, canvas.height - 80);
+
+                                        const attachment = new Discord.MessageAttachment(canvas.toBuffer(),     'verse.png');
+
+                                        // verseText + "\n" + ref
+                                        message.channel.send("", attachment)
                                             .then(() => console.log("verse sent"))
                                             .catch((error) => console.log(error));
                                     })
