@@ -20,7 +20,6 @@ module.exports =  (client, message) => {
             console.log("Access restricted");
         });
     }
-
     // add user to database
     else if (message.content.startsWith("!add")) {
         const args = message.content.slice(4).trim().split(' ');
