@@ -2,6 +2,7 @@ const path = require('path');
 //const fs = require('fs');
 const {Wit, log} = require('node-wit');
 const ScriptureApi = require('scripture-api');
+const jsdom = require("jsdom");
 const https = require('https');
 const userController = require('../controllers/user.controller');
 const {wit_token, scripture_token, message_channels, roles} = require('../../config');
@@ -13,6 +14,8 @@ const wit_client = new Wit({
     accessToken: wit_token,
     logger: new log.Logger(log.DEBUG)
 });
+
+const { JSDOM } = jsdom;
 
 module.exports =  (client, message) => {
     if (message.author == client.user) return;
@@ -90,7 +93,7 @@ module.exports =  (client, message) => {
                                 const options = {
                                     host: 'api.scripture.api.bible',
                                     path: '/v1/bibles/' + bibleId + '/verses/' + verseId +
-                                        '?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=true&include-verse-numbers=true&include-verse-spans=false&use-org-id=false',
+                                        '?content-type=html&include-notes=false&include-titles=false&include-chapter-numbers=true&include-verse-numbers=true&include-verse-spans=false&use-org-id=false',
                                     headers: {
                                         'accept': 'application/json',
                                         'api-key': scripture_token
@@ -98,9 +101,26 @@ module.exports =  (client, message) => {
                                 }
                                 const req = https.request(options, res => {
                                     console.log(`statusCode: ${res.statusCode}`)
-
+                                    var data = ''
                                     res.on('data', d => {
-                                        process.stdout.write(d)
+                                       // process.stdout.write(d);
+                                        data += d;
+                                    })
+
+                                    res.on('end', d => {
+                                        let obj = JSON.parse(data);
+                                        console.log(obj['data']['content'] + "\n\n");
+                                        const readingDom = new JSDOM(obj['data']['content']);
+                                        let verseText = readingDom.window.document.querySelector("p").textContent;
+                                        while (verseText.charAt(0).match(/^[0-9]+$/)) {
+                                            verseText = verseText.substring(1);
+                                        }
+                                       // console.log(verseText);
+                                        let ref = obj['data']['reference'];
+                                        console.log(obj)
+                                        message.channel.send(verseText + "\n" + ref)
+                                            .then(() => console.log("verse sent"))
+                                            .catch((error) => console.log(error));
                                     })
                                 })
 

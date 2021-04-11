@@ -15,14 +15,15 @@
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.6",
     "fluent-ffmpeg": "^2.1.2",
+    "jsdom": "^16.5.2",
     "mongoose": "^5.12.3",
     "node-opus": "^0.3.3",
     "node-wit": "^6.0.0",
     "node-witai-speech": "~1.0.2",
     "path": "^0.12.7",
     "require-all": "^3.0.0",
-    "underscore": "^1.10.2",
+    "scripture-api": "^1.0.3",
     "snoowrap": "^1.22.0",
-    "scripture-api": "^1.0.3"
+    "underscore": "^1.10.2"
   }
 }
