@@ -1,9 +1,13 @@
 const path = require('path');
 //const fs = require('fs');
 const {Wit, log} = require('node-wit');
+const ScriptureApi = require('scripture-api');
+const https = require('https');
 const userController = require('../controllers/user.controller');
-const {wit_token, message_channels, roles} = require('../../config');
+const {wit_token, scripture_token, message_channels, roles} = require('../../config');
 var global = require('../../global');
+
+const scriptureApi = new ScriptureApi(scripture_token); // Temp, will move when nlp functionalilty added
 
 const wit_client = new Wit({
     accessToken: wit_token,
@@ -21,6 +25,12 @@ module.exports =  (client, message) => {
             console.log("Access restricted");
         });
     }
+
+    // debug
+    if (message.content == "!ping") {
+        message.channel.send("!pong").then(() => {console.log("bot pinged!");});
+    }
+
     // add user to database
     else if (message.content.startsWith("!add")) {
         const args = message.content.slice(4).trim().split(' ');
@@ -56,6 +66,80 @@ module.exports =  (client, message) => {
                 global.voice_settings.dipsatcher = connection.play(path.join(__dirname, "../audio/start.mp3"), {volume: 0.5});
             });
         } else message.reply("please join a voice channel!");
+    }
+
+    // Temporary - move this to nlp
+    else if (message.content === '!bible-reading') {
+        const bibleId = 'de4e12af7f28f599-01' // King James bibleid
+        scriptureApi.getBibleBooks(bibleId, {includeChapters: false, includeChaptersAndSections: false})
+            .then((books) => {
+                //console.log(data["data"].length);
+                let bookNum = Math.floor(Math.random() * books["data"].length);
+                const bookId = books["data"][bookNum].id;
+
+                scriptureApi.getBibleBookChapters(bibleId, bookId)
+                    .then((chapters) => {
+                        let chapterNum = Math.floor(Math.random() * chapters["data"].length);
+                        const chapterId = chapters["data"][chapterNum].id;
+
+                        scriptureApi.getBibleChapterVerses(bibleId, chapterId)
+                            .then((verses) => {
+                                let verseNum = Math.floor(Math.random() * verses["data"].length);
+                                const verseId = verses["data"][verseNum].id;
+
+                                const options = {
+                                    host: 'api.scripture.api.bible',
+                                    path: '/v1/bibles/' + bibleId + '/verses/' + verseId +
+                                        '?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=true&include-verse-numbers=true&include-verse-spans=false&use-org-id=false',
+                                    headers: {
+                                        'accept': 'application/json',
+                                        'api-key': scripture_token
+                                    }
+                                }
+                                const req = https.request(options, res => {
+                                    console.log(`statusCode: ${res.statusCode}`)
+
+                                    res.on('data', d => {
+                                        process.stdout.write(d)
+                                    })
+                                })
+
+                                req.on('error', error => {
+                                    console.error(error)
+                                })
+
+                                req.end();
+                               /* const params = {
+                                    contentType: "json",
+                                    includeNotes: false,
+                                    includeTitles: true,
+                                    includeChapterNumbers: true,
+                                    includeVerseNumbers: true,
+                                    includeVerseSpans: false,
+                                    paralles: ''
+                                };*/
+
+                               /* scriptureApi.getBibleVerses(bibleId, chapterId)
+                                    .then((verse) => {
+                                        console.log(verse);
+                                    })
+                                    .catch((error) => {
+                                        console.log(error);
+                                    })*/
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            })
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+
+            })
+            .catch((error) => {
+                console.log(error);
+                message.channel.send("Something went wrong!");
+            });
     }
 
     // logout
