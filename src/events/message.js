@@ -9,6 +9,7 @@ const wit_client = new Wit({
     accessToken: wit_token,
     logger: new log.Logger(log.DEBUG)
 });
+
 module.exports =  (client, message) => {
     if (message.author == client.user) return;
     else if (message.author.bot) return;
